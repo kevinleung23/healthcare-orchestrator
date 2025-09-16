@@ -1,66 +1,75 @@
-import os
-import time
+import asyncio
 
-from azure.ai.projects import AIProjectClient
-from azure.ai.agents.models import AgentThreadCreationOptions, ThreadMessageOptions, ListSortOrder
-from azure.identity import DefaultAzureCredential
+from semantic_kernel import Kernel
+from semantic_kernel.utils.logging import setup_logging
+from semantic_kernel.functions import kernel_function
+from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
+from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
+from semantic_kernel.connectors.ai.chat_completion_client_base import ChatCompletionClientBase
+from semantic_kernel.contents.chat_history import ChatHistory
+from semantic_kernel.functions.kernel_arguments import KernelArguments
 
-from dotenv import load_dotenv
-load_dotenv()
-
-# Replace these with your Azure AI Foundry project details
-AZURE_PROJECT_ENDPOINT = os.getenv("AZURE_PROJECT_ENDPOINT")
-AZURE_PROJECT_NAME = os.getenv("AZURE_PROJECT_NAME")
-AZURE_PROJECT_KEY = os.getenv("AZURE_PROJECT_KEY")
-GPT_DEPLOYMENT_NAME = os.getenv("OPENAI_MODEL")
-
-
-# Create a project client
-project_client = AIProjectClient(
-    endpoint=f"{AZURE_PROJECT_ENDPOINT}/projects/{AZURE_PROJECT_NAME}",
-    credential=DefaultAzureCredential()
+from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_prompt_execution_settings import (
+    AzureChatPromptExecutionSettings,
 )
+from agents.plugin.LightsPlugin import LightsPlugin
+from dotenv import load_dotenv
+import os
 
-with project_client:
-    agents_client = project_client.agents
 
-    agent = agents_client.create_agent(
-        model=GPT_DEPLOYMENT_NAME,
-        name="sample-agent",
-        instructions="You are a helpful assistant that tells jokes.",
+async def main():
+    # Initialize the kernel
+    kernel = Kernel()
+
+    # Add Azure OpenAI chat completion
+    load_dotenv()
+
+    chat_completion = AzureChatCompletion(
+        deployment_name=os.getenv("AZURE_DEPLOYMENT_NAME"),
+        api_key=os.getenv("AZURE_DEPLOYMENT_KEY"),
+        base_url=os.getenv("AZURE_DEPLOYMENT_ENDPOINT"),
     )
-    print(f"✅ Created agent: {agent.name} | id: {agent.id}")
+    kernel.add_service(chat_completion)
 
-    # [START create_thread_and_run]
-    # Prepare the initial user message
-    initial_message = ThreadMessageOptions(role="user", content="Hello! Can you tell me a joke?")
-
-    # Create a new thread and immediately start a run on it
-    run = agents_client.create_thread_and_run(
-        agent_id=agent.id,
-        thread=AgentThreadCreationOptions(messages=[initial_message]),
+    # Add a plugin (the LightsPlugin class is defined below)
+    kernel.add_plugin(
+        LightsPlugin(),
+        plugin_name="Lights",
     )
-    # [END create_thread_and_run]
 
-    # Poll the run as long as run status is queued or in progress
-    while run.status in ["queued", "in_progress", "requires_action"]:
-        # Wait for a second
-        time.sleep(1)
-        run = agents_client.runs.get(thread_id=run.thread_id, run_id=run.id)
-        print(f"Run status: {run.status}")
+    # Enable planning
+    execution_settings = AzureChatPromptExecutionSettings()
+    execution_settings.function_choice_behavior = FunctionChoiceBehavior.Auto()
 
-    if run.status == "failed":
-        print(f"Run error: {run.last_error}")
+    # Create a history of the conversation
+    history = ChatHistory()
 
-    # List all messages in the thread, in ascending order of creation
-    messages = agents_client.messages.list(thread_id=run.thread_id, order=ListSortOrder.ASCENDING)
+    # Initiate a back-and-forth chat
+    userInput = None
+    while True:
+        # Collect user input
+        userInput = input("User > ")
 
-    for msg in messages:
-        if msg.text_messages:
-            last_text = msg.text_messages[-1]
-            print(f"{msg.role}: {last_text.text.value}")
+        # Terminate the loop if the user says "exit"
+        if userInput == "exit":
+            break
 
-    # clean up
-    agents_client.delete_agent(agent.id)
-    print("🧹 Cleaned up all resources")
-    print(f"Deleted agent: {agent.name}")
+        # Add user input to the history
+        history.add_user_message(userInput)
+
+        # Get the response from the AI
+        result = await chat_completion.get_chat_message_content(
+            chat_history=history,
+            settings=execution_settings,
+            kernel=kernel,
+        )
+
+        # Print the results
+        print("Assistant > " + str(result))
+
+        # Add the message from the agent to the chat history
+        history.add_message(result)
+
+# Run the main function
+if __name__ == "__main__":
+    asyncio.run(main())
