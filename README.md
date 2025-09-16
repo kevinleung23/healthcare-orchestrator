@@ -4,8 +4,7 @@ A Python-based healthcare orchestrator that leverages Azure AI Foundry to create
 
 ## Prerequisites
 
-- Python 3.11 or higher
-- Azure CLI
+- Python 3.12 or higher
 - Azure subscription with AI Foundry access
 - Azure AI project with GPT model deployment
 
@@ -13,19 +12,16 @@ A Python-based healthcare orchestrator that leverages Azure AI Foundry to create
 
 1. Install Dependencies using Poetry (recommended): `poetry install`
 1. Copy the example environment file: `cp .env.example .env`
-1. Update the `.env` file with your Azure AI Foundry project details
-1. Login to Azure CLI: `az login`
-    - Or configure your Azure credentials using environment variables
+1. Update the `.env` file with your LLM endpoint values
 
 ## Usage
 
 ### Running the Agent
 
 ```bash
-python src/healthcare_orchestrator/agent.py
+python src/agents/sample.py
 ```
 
 ## Resources
 
 - [Azure AI Foundry Documentation](https://docs.microsoft.com/azure/ai-foundry/)
-- [Azure SDK for Python Samples](https://github.com/Azure/azure-sdk-for-python/tree/azure-ai-projects_1.0.0/sdk/ai/azure-ai-projects/samples)
