@@ -8,6 +8,9 @@ from semantic_kernel.contents.chat_history import ChatHistory
 from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_prompt_execution_settings import (
     AzureChatPromptExecutionSettings,
 )
+from agents.plugin.PatientStatus import PatientStatus
+from agents.plugin.PatientTimeline import PatientTimeline
+from agents.plugin.TumorBoardReview import TumorBoardReview
 from agents.plugin.StorageQuery import StorageQuery
 from dotenv import load_dotenv
 import os
@@ -34,6 +37,18 @@ async def main():
             container_name="patient-data",
         ),
         plugin_name="PatientDataStorage",
+    )
+    kernel.add_plugin(
+        TumorBoardReview(),
+        plugin_name="TumorBoardReview",
+    )
+    kernel.add_plugin(
+        PatientTimeline(),
+        plugin_name="PatientTimeline",
+    )
+    kernel.add_plugin(
+        PatientStatus(),
+        plugin_name="PatientStatus",
     )
 
     # Enable planning
