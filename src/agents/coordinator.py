@@ -1,18 +1,14 @@
 import asyncio
 
 from semantic_kernel import Kernel
-from semantic_kernel.utils.logging import setup_logging
-from semantic_kernel.functions import kernel_function
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
-from semantic_kernel.connectors.ai.chat_completion_client_base import ChatCompletionClientBase
 from semantic_kernel.contents.chat_history import ChatHistory
-from semantic_kernel.functions.kernel_arguments import KernelArguments
 
 from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_prompt_execution_settings import (
     AzureChatPromptExecutionSettings,
 )
-from agents.plugin.LightsPlugin import LightsPlugin
+from agents.plugin.StorageQuery import StorageQuery
 from dotenv import load_dotenv
 import os
 
@@ -31,10 +27,13 @@ async def main():
     )
     kernel.add_service(chat_completion)
 
-    # Add a plugin (the LightsPlugin class is defined below)
+    # Add a plugins
     kernel.add_plugin(
-        LightsPlugin(),
-        plugin_name="Lights",
+        StorageQuery(
+            account_url=os.getenv("STORAGE_ACCOUNT_URL"),
+            container_name="patient-data",
+        ),
+        plugin_name="PatientDataStorage",
     )
 
     # Enable planning
