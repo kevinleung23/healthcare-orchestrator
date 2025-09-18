@@ -1,5 +1,8 @@
 import asyncio
+import uuid
 
+from azure.identity.aio import DefaultAzureCredential
+from azure.storage.blob.aio import BlobServiceClient
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
@@ -14,6 +17,10 @@ from agents.plugin.TumorBoardReview import TumorBoardReview
 from agents.plugin.StorageQuery import StorageQuery
 from dotenv import load_dotenv
 import os
+
+from data_models.chat_context import ChatContext
+from data_models.data_access import create_data_access
+from tools.content_export.content_export import ContentExportPlugin
 
 
 async def main():
@@ -31,12 +38,29 @@ async def main():
     )
     kernel.add_service(chat_completion)
 
+    # Create a chat context with a conversation ID
+    conversation_id = str(uuid.uuid4())
+    chat_ctx = ChatContext(conversation_id=conversation_id)
+    
+    # Create blob service client and credential for data access
+    credential = DefaultAzureCredential()
+    blob_service_client = BlobServiceClient(
+        account_url=os.getenv("STORAGE_ACCOUNT_URL"),
+        credential=credential
+    )
+    
+    # Create data access using the factory function
+    data_access = create_data_access(blob_service_client, credential)
+    
+    # Create storage plugin
+    storage_plugin = StorageQuery(
+        account_url=os.getenv("STORAGE_ACCOUNT_URL"),
+        container_name="patient-data",
+    )
+    
     # Add a plugins
     kernel.add_plugin(
-        StorageQuery(
-            account_url=os.getenv("STORAGE_ACCOUNT_URL"),
-            container_name="patient-data",
-        ),
+        storage_plugin,
         plugin_name="PatientDataStorage",
     )
     kernel.add_plugin(
@@ -56,6 +80,14 @@ async def main():
             kernel=kernel,
         ),
         plugin_name="PatientStatus",
+    )
+
+    kernel.add_plugin(
+        ContentExportPlugin(
+            kernel=kernel, 
+            chat_ctx=chat_ctx, 
+            data_access=data_access),
+        plugin_name="ContentExport",
     )
 
     # Enable planning
