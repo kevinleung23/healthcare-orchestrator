@@ -39,10 +39,12 @@ async def main():
         ),
         plugin_name="PatientDataStorage",
     )
-    # kernel.add_plugin(
-    #     TumorBoardReview(),
-    #     plugin_name="TumorBoardReview",
-    # )
+    kernel.add_plugin(
+        TumorBoardReview(
+            kernel=kernel,
+        ),
+        plugin_name="TumorBoardReview",
+    )
     kernel.add_plugin(
         PatientTimeline(
             kernel=kernel,
