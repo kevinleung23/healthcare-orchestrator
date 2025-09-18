@@ -16,10 +16,16 @@ A Python-based healthcare orchestrator that leverages Azure AI Foundry to create
 
 ## Usage
 
-### Running the Agent
+### Running the Agent in CLI
 
 ```bash
-python src/agents/sample.py
+python src/agents/coordinator.py
+```
+
+### Running the Agent in UI
+
+```bash
+python src/agents/ui_chat.py
 ```
 
 ## Resources
