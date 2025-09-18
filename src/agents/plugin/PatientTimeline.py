@@ -23,6 +23,7 @@ class PatientTimeline:
         # Add instructions
         chat_history.add_system_message(
             "Create a chronological timeline of key events from the patient's medical history."
+            "The output should be in markdown format"
         )
 
         # Add patient history
