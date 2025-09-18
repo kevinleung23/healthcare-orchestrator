@@ -64,7 +64,7 @@ class BackendWorker(QObject):
         )
         self.kernel.add_service(self.chat_completion)
         self.kernel.add_plugin(StorageQuery(
-            account_url=os.getenv("STORAGE_ACCOUNT_URL"),
+            account_url=os.getenv("AZURE_STORAGE_ACCOUNT_URL"),
             container_name="patient-data",
         ), plugin_name="PatientDataStorage")
         self.kernel.add_plugin(TumorBoardReview(self.kernel), plugin_name="TumorBoardReview")

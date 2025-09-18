@@ -34,7 +34,7 @@ async def main():
     # Add a plugins
     kernel.add_plugin(
         StorageQuery(
-            account_url=os.getenv("STORAGE_ACCOUNT_URL"),
+            account_url=os.getenv("AZURE_STORAGE_ACCOUNT_URL"),
             container_name="patient-data",
         ),
         plugin_name="PatientDataStorage",
