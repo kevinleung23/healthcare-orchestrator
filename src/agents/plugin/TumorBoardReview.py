@@ -1,6 +1,5 @@
 from semantic_kernel import Kernel
 from semantic_kernel.functions import kernel_function
-from docx import Document
 import os
 
 
@@ -15,5 +14,12 @@ class TumorBoardReview:
         description="Creates a tumor board review document for a patient.",
     )
     def create_tumor_board_review(self, patient_timeline: str, patient_status: str) -> str:
-        print(">>>>>>>>>>>>>>>>>>>>> Creating tumor board review document...")
-        return ""
+        print("Creating tumor board review document...")
+        return f"""
+        Patient Tumor Board Review
+        Patient Timeline:
+        {patient_timeline}
+
+        Patient Status:
+        {patient_status}
+        """

@@ -24,6 +24,7 @@ class PatientStatus:
         chat_history.add_system_message(
             "Create a concise summary of the patient's current status based on their timeline."
             "This should not be more than 3-5 sentences."
+            "The output should be in markdown format"
         )
 
         # Add patient history
