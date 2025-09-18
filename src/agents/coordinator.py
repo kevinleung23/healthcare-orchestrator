@@ -24,6 +24,7 @@ async def main():
     load_dotenv()
 
     chat_completion = AzureChatCompletion(
+        service_id="chat_completion",
         deployment_name=os.getenv("AZURE_DEPLOYMENT_NAME"),
         api_key=os.getenv("AZURE_DEPLOYMENT_KEY"),
         base_url=os.getenv("AZURE_DEPLOYMENT_ENDPOINT"),
@@ -38,18 +39,20 @@ async def main():
         ),
         plugin_name="PatientDataStorage",
     )
+    # kernel.add_plugin(
+    #     TumorBoardReview(),
+    #     plugin_name="TumorBoardReview",
+    # )
     kernel.add_plugin(
-        TumorBoardReview(),
-        plugin_name="TumorBoardReview",
-    )
-    kernel.add_plugin(
-        PatientTimeline(),
+        PatientTimeline(
+            kernel=kernel,
+        ),
         plugin_name="PatientTimeline",
     )
-    kernel.add_plugin(
-        PatientStatus(),
-        plugin_name="PatientStatus",
-    )
+    # kernel.add_plugin(
+    #     PatientStatus(),
+    #     plugin_name="PatientStatus",
+    # )
 
     # Enable planning
     execution_settings = AzureChatPromptExecutionSettings()
