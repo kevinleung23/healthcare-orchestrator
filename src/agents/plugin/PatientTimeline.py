@@ -16,6 +16,7 @@ class PatientTimeline:
         description="Creates a patient timeline document given the patient's medical history.",
     )
     async def create_patient_timeline(self, patient_data: str) -> str:
+        print("Creating patient timeline...")
         # Create chat history
         chat_history = ChatHistory()
 

@@ -49,10 +49,12 @@ async def main():
         ),
         plugin_name="PatientTimeline",
     )
-    # kernel.add_plugin(
-    #     PatientStatus(),
-    #     plugin_name="PatientStatus",
-    # )
+    kernel.add_plugin(
+        PatientStatus(
+            kernel=kernel,
+        ),
+        plugin_name="PatientStatus",
+    )
 
     # Enable planning
     execution_settings = AzureChatPromptExecutionSettings()
