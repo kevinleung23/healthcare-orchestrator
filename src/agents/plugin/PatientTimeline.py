@@ -15,7 +15,7 @@ class PatientTimeline:
         name="create_patient_timeline",
         description="Creates a patient timeline document given the patient's medical history.",
     )
-    async def create_patient_timeline(self, patient_data: str) -> str:
+    async def create_patient_timeline(self, patient_data: str) -> list[str]:
         print("Creating patient timeline...")
         # Create chat history
         chat_history = ChatHistory()
@@ -23,7 +23,7 @@ class PatientTimeline:
         # Add instructions
         chat_history.add_system_message(
             "Create a chronological timeline of key events from the patient's medical history."
-            "The output should be in markdown format"
+            "The output should be a list of strings very concise descriptions of each event following this format `mm/dd/yyyy - description`. Use acronyms whenever is possible."
         )
 
         # Add patient history
