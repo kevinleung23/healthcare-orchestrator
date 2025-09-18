@@ -49,7 +49,7 @@ class BackendWorker(QObject):
         self.kernel = None
         self.chat_completion = None
         self.history = ChatHistory()
-        self.execution_settings = AzureChatPromptExecutionSettings()
+        self.execution_settings = AzureChatPromptExecutionSettings(temperature=0.0)
         self.execution_settings.function_choice_behavior = FunctionChoiceBehavior.Auto()
         self._init_kernel()
 

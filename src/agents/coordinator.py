@@ -59,7 +59,7 @@ async def main():
     )
 
     # Enable planning
-    execution_settings = AzureChatPromptExecutionSettings()
+    execution_settings = AzureChatPromptExecutionSettings(temperature=0.0)
     execution_settings.function_choice_behavior = FunctionChoiceBehavior.Auto()
 
     # Create a history of the conversation
