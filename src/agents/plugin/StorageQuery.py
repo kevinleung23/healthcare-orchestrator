@@ -2,14 +2,19 @@ from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 from semantic_kernel.functions import kernel_function
 import json
+import os
 
 
 class StorageQuery:
     def __init__(self, account_url: str, container_name: str):
         self.account_url = account_url
         self.container_name = container_name
-        self.credential = DefaultAzureCredential()
-        self.client = BlobServiceClient(account_url=self.account_url, credential=self.credential)
+        connection_string = os.environ.get("AZURE_STORAGE_CONNECTION_STRING")
+        if connection_string:
+            self.client = BlobServiceClient.from_connection_string(connection_string)
+        else:
+            # Fallback to DefaultAzureCredential if connection string is not set
+            self.client = BlobServiceClient(account_url=self.account_url, credential=DefaultAzureCredential())
         self.container_client = self.client.get_container_client(self.container_name)
 
     @kernel_function(

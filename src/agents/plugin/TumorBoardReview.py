@@ -11,7 +11,7 @@ class TumorBoardReview:
 
     @kernel_function(
         name="create_tumor_board_review",
-        description="Creates a tumor board review document for a patient.",
+        description="Creates a tumor board review document for a patient given a patient timeline and status.",
     )
     def create_tumor_board_review(self, patient_timeline: str, patient_status: str) -> str:
         print("Creating tumor board review document...")
