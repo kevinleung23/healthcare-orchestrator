@@ -22,9 +22,21 @@ class PatientStatus:
 
         # Add instructions
         chat_history.add_system_message(
-            "Create a concise summary of the patient's current status based on their timeline."
-            "This should not be more than 3-5 sentences."
-            "The output should be in markdown format"
+            "You are an AI agent that provides the patient's current status. "
+            "Make sure to explicitly mention these characteristics before presenting the patient's current status.\n"
+            "  'age':\n"
+            "  'patient_gender':\n"
+            "  'staging':\n"
+            "  'primary site':\n"
+            "  'histology':\n"
+            "  'biomarkers'\n"
+            "  'treatment history':\n"
+            "  'ecog performance status':\n\n"
+            "Don't proceed unless you have all of this information.\n"
+            "You may infer this information from the conversation if it is available.\n"
+            "If this information is not available, ask PatientHistory specifically for the missing information.\n"
+            "DO:\n"
+            "  Ask PatientHistory. EXAMPLE: \"*PatientHistory*, can you provide me with the patient's #BLANK?. Try to infer the information if not available\"."
         )
 
         # Add patient history
